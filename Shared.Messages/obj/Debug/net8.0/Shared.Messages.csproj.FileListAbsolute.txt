@@ -1,0 +1,11 @@
+G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\bin\Debug\net8.0\Shared.Messages.deps.json
+G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\bin\Debug\net8.0\Shared.Messages.dll
+G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\bin\Debug\net8.0\Shared.Messages.pdb
+G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\obj\Debug\net8.0\Shared.Messages.GeneratedMSBuildEditorConfig.editorconfig
+G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\obj\Debug\net8.0\Shared.Messages.AssemblyInfoInputs.cache
+G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\obj\Debug\net8.0\Shared.Messages.AssemblyInfo.cs
+G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\obj\Debug\net8.0\Shared.Messages.csproj.CoreCompileInputs.cache
+G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\obj\Debug\net8.0\Shared.Messages.dll
+G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\obj\Debug\net8.0\refint\Shared.Messages.dll
+G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\obj\Debug\net8.0\Shared.Messages.pdb
+G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\obj\Debug\net8.0\ref\Shared.Messages.dll

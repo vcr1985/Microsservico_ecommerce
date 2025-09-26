@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "Estoque Service",
+    "Version": "v1",
+    "Url": "http://localhost:5001/swagger/v1/swagger.json"
+  },
+  {
+    "Name": "Vendas Service",
+    "Version": "v1",
+    "Url": "http://localhost:5002/swagger/v1/swagger.json"
+  },
+  {
+    "Name": "Pagamentos Service",
+    "Version": "v1",
+    "Url": "http://localhost:5003/swagger/v1/swagger.json"
+  }
+]
