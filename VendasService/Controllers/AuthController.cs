@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.ComponentModel.DataAnnotations;
+using VendasService.Models;
+using VendasService.Services;
 
 namespace VendasService.Controllers
 {
@@ -11,150 +8,57 @@ namespace VendasService.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
+        private readonly ITokenService _tokenService;
         private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IConfiguration configuration, ILogger<AuthController> logger)
+        public AuthController(ITokenService tokenService, ILogger<AuthController> logger)
         {
-            _configuration = configuration;
+            _tokenService = tokenService;
             _logger = logger;
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest request)
+        public ActionResult<LoginResponse> Login([FromBody] LoginModel loginModel)
         {
             try
             {
-                if (!ModelState.IsValid)
+                _logger.LogInformation("Tentativa de login para usuário: {Username}", loginModel.Username);
+                
+                if (IsValidUser(loginModel.Username, loginModel.Password))
                 {
-                    return BadRequest(ModelState);
+                    var response = _tokenService.GenerateLoginResponse(loginModel.Username);
+                    
+                    _logger.LogInformation("Login realizado com sucesso para usuário: {Username}", loginModel.Username);
+                    
+                    return Ok(response);
                 }
 
-                // Autenticação simples para testes (substituir por autenticação real)
-                if (request.Username != "admin" || request.Password != "123")
-                {
-                    _logger.LogWarning("Tentativa de login falhada para usuário: {Username}", request.Username);
-                    return Unauthorized(new { message = "Usuário ou senha inválidos" });
-                }
-
-                // Claims do usuário
-                var claims = new[]
-                {
-                    new Claim(ClaimTypes.Name, request.Username),
-                    new Claim(ClaimTypes.Role, "Admin"),
-                    new Claim("ClienteId", request.Username) // Para rastreamento do cliente
-                };
-
-                // Chave secreta (deve ser igual à usada na configuração JWT)
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                    _configuration["Jwt:Key"] ?? "ChaveSuperSecretaParaJWTTokenSeguro@2025!"));
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-                // Gerar token JWT
-                var token = new JwtSecurityToken(
-                    issuer: _configuration["Jwt:Issuer"],
-                    audience: _configuration["Jwt:Audience"],
-                    claims: claims,
-                    expires: DateTime.Now.AddHours(1),
-                    signingCredentials: creds);
-
-                _logger.LogInformation("Login realizado com sucesso para usuário: {Username}", request.Username);
-
-                return Ok(new
-                {
-                    token = new JwtSecurityTokenHandler().WriteToken(token),
-                    expiration = token.ValidTo,
-                    user = new
-                    {
-                        username = request.Username,
-                        role = "Admin"
-                    }
-                });
+                _logger.LogWarning("Credenciais inválidas para usuário: {Username}", loginModel.Username);
+                return Unauthorized(new { message = "Credenciais inválidas" });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro durante o processo de login");
-                return StatusCode(500, "Erro interno do servidor");
+                _logger.LogError(ex, "Erro durante o login");
+                return StatusCode(500, new { message = "Erro interno do servidor" });
             }
         }
 
-        [HttpPost("refresh")]
-        public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
+        private bool IsValidUser(string username, string password)
         {
-            try
+            _logger.LogInformation("Validando usuário: {Username}", username);
+            
+            var validUsers = new Dictionary<string, string>
             {
-                // Implementação básica de refresh token
-                // Em produção, implementar com refresh tokens seguros
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.UTF8.GetBytes(
-                    _configuration["Jwt:Key"] ?? "ChaveSuperSecretaParaJWTTokenSeguro@2025!");
+                { "admin", "admin123" },
+                { "user", "user123" },
+                { "test", "test123" },
+                { "vendas", "vendas123" }
+            };
 
-                try
-                {
-                    tokenHandler.ValidateToken(request.Token, new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = true,
-                        ValidIssuer = _configuration["Jwt:Issuer"],
-                        ValidateAudience = true,
-                        ValidAudience = _configuration["Jwt:Audience"],
-                        ValidateLifetime = false, // Não validar expiração para refresh
-                        ClockSkew = TimeSpan.Zero
-                    }, out SecurityToken validatedToken);
-
-                    var jwtToken = (JwtSecurityToken)validatedToken;
-                    var username = jwtToken.Claims.First(x => x.Type == ClaimTypes.Name).Value;
-
-                    // Gerar novo token
-                    var claims = new[]
-                    {
-                        new Claim(ClaimTypes.Name, username),
-                        new Claim(ClaimTypes.Role, "Admin"),
-                        new Claim("ClienteId", username)
-                    };
-
-                    var newKey = new SymmetricSecurityKey(key);
-                    var creds = new SigningCredentials(newKey, SecurityAlgorithms.HmacSha256);
-
-                    var newToken = new JwtSecurityToken(
-                        issuer: _configuration["Jwt:Issuer"],
-                        audience: _configuration["Jwt:Audience"],
-                        claims: claims,
-                        expires: DateTime.Now.AddHours(1),
-                        signingCredentials: creds);
-
-                    return Ok(new
-                    {
-                        token = tokenHandler.WriteToken(newToken),
-                        expiration = newToken.ValidTo
-                    });
-                }
-                catch
-                {
-                    return Unauthorized(new { message = "Token inválido" });
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Erro ao fazer refresh do token");
-                return StatusCode(500, "Erro interno do servidor");
-            }
+            var isValid = validUsers.ContainsKey(username) && validUsers[username] == password;
+            _logger.LogInformation("Resultado da validação para {Username}: {IsValid}", username, isValid);
+            
+            return isValid;
         }
-    }
-
-    public class LoginRequest
-    {
-        [Required(ErrorMessage = "Username é obrigatório")]
-        public string Username { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Password é obrigatório")]
-        public string Password { get; set; } = string.Empty;
-    }
-
-    public class RefreshTokenRequest
-    {
-        [Required(ErrorMessage = "Token é obrigatório")]
-        public string Token { get; set; } = string.Empty;
     }
 }

@@ -35,6 +35,7 @@ builder.Services.AddSingleton<IConnectionFactory>(sp =>
 // Serviços personalizados
 builder.Services.AddScoped<IEstoqueService, EstoqueService>();
 builder.Services.AddScoped<IRabbitMQPublisher, RabbitMQPublisher>();
+builder.Services.AddScoped<ITokenService, TokenService>(); // ADICIONE ESTA LINHA
 builder.Services.AddHttpClient<IEstoqueService, EstoqueService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["Services:EstoqueService"] ?? "https://localhost:7145");
@@ -106,6 +107,21 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+// Criar banco de dados automaticamente
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<VendasContext>();
+    try
+    {
+        context.Database.EnsureCreated();
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Erro ao criar/migrar banco de dados");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

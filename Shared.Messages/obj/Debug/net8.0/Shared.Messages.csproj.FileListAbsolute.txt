@@ -9,3 +9,4 @@ G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\obj\Debug\net
 G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\obj\Debug\net8.0\refint\Shared.Messages.dll
 G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\obj\Debug\net8.0\Shared.Messages.pdb
 G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\obj\Debug\net8.0\ref\Shared.Messages.dll
+G:\Desafio-Técnico-Avanade\EcommerceMicroservices\Shared.Messages\obj\Debug\net8.0\Shared.Messages.sourcelink.json
