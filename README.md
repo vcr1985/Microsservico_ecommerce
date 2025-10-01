@@ -269,7 +269,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para de
 
 ## 👥 Autor
 
-- **Evandro Ramos** - *Desenvolvimento inicial* - [GitHub](https://github.com/vcr1985)
+- **Vando Ramos** - *Desenvolvimento inicial* - [GitHub](https://github.com/vcr1985)
 
 ## 📞 Suporte
 
